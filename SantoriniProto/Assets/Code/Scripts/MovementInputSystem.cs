@@ -23,6 +23,7 @@ public class MovementInputSystem : MonoBehaviour
     [SerializeField] private float speedModifier = .1f;
     private float normalHit;
     private bool canCheckNormal;
+    private Vector2 lastDir;
 
     [Header("Rotation")]
     [SerializeField] [Range(0, 1f)] private float turnSmoothTime = .1f;
@@ -132,21 +133,17 @@ public class MovementInputSystem : MonoBehaviour
                     //non stai urtando
                     //anche se andiamo avanti quando stiamo sotto si modifica perché moveDir.x cambia sempre
                     tParam += moveDir.x * speedModifier;
+
+                    lastDir = moveDir;
+
                     canRotate = true;
                 }
                 else
                 {
                     //Sta urtando
-                    if (Mathf.Sign(normalHit) >= 0f)
+                    if (Mathf.Sign(normalHit) < 0f)
                     {
-                        if(moveDir.x > 0)
-                        {
-                            tParam += moveDir.x * speedModifier;
-                        }
-                    }
-                    else
-                    {
-                        if (moveDir.x < 0)
+                        if(lastDir.x != moveDir.x)
                         {
                             tParam += moveDir.x * speedModifier;
                         }
@@ -157,9 +154,6 @@ public class MovementInputSystem : MonoBehaviour
                     Mathf.Pow(1 - tParam, 2) * tParam * p1 + 3 * (1 - tParam) *
                     Mathf.Pow(tParam, 2) * p2 +
                     Mathf.Pow(tParam, 3) * p3;
-                //Debug.Log("Questo è objectPosition: " + objectPosition);
-
-                //Debug.Log("Questo è tParam: " + tParam);
             }
             else
             {
@@ -195,7 +189,10 @@ public class MovementInputSystem : MonoBehaviour
 
         if (vSpeed > -5)
         {
-            vSpeed -= gravity * Time.deltaTime;
+            if (!controller.isGrounded)
+            {
+                vSpeed -= gravity * Time.deltaTime;
+            }
         }
         
         Debug.Log("vSpeed è: " + vSpeed);
@@ -225,9 +222,11 @@ public class MovementInputSystem : MonoBehaviour
     {
         if ((controller.collisionFlags & CollisionFlags.Sides) != 0 && canCheckNormal)
         {
-            normalHit = hit.normal.x + hit.normal.z;
+            //normalHit = hit.normal.x + hit.normal.z;
+            normalHit = Vector3.Dot(transform.forward, hit.normal);
             canCheckNormal = false;
             canRotate = false;
+            //Debug.Log("forward " + transform.forward + "normal " + hit.normal + "normal hit" + normalHit);
         }
         else
         {
