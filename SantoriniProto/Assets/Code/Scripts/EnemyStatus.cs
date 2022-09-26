@@ -2,16 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class EnemyStatus : MonoBehaviour
 {
     public BoxCollider TopCollider;
     public CapsuleCollider BodyCollider;
     public LayerMask PlayerLayerMask;
     public bool IsStompable;
     public bool IsHittable;
-    private InteractionManager PlayerCharacter;
+    public byte PrimaryAttackPoints;
+    public byte SecondaryAttackPoints;
+    private PlayerStatus Player;
     public CharacterController EnemyController;
     [SerializeField] private byte LifePoints;
+
     [SerializeField] private bool IsEnemy;
     [SerializeField] private bool IsAllied;
 
@@ -20,25 +23,20 @@ public class Enemy : MonoBehaviour
         IsEnemy = true;
         IsAllied = !IsEnemy;
         LifePoints = 2;
-        PlayerCharacter = GameObject.FindGameObjectWithTag("Player").GetComponent<InteractionManager>();
-    }
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.tag.CompareTo("Player") == 0)
-        {
-            if ()
-                if (--LifePoints == 0) Destroy(gameObject);
-        }   
+        Player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerStatus>();
     }
 
-    private byte TakeDamage(PowerUp power = null) 
+    public void TakeDamage(byte damage) 
     {
-        if (power == null) --LifePoints;
-        else
-        {
-
-        }
+        LifePoints -= damage;
     }
+
+    public void Damage(PlayerStatus player)
+    {
+        player.TakeDamage(PrimaryAttackPoints);
+    }
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -55,7 +53,7 @@ public class Enemy : MonoBehaviour
             }
             else
             {
-
+                Damage(PlayerCharacter.gameObject)
             }
             
         }
