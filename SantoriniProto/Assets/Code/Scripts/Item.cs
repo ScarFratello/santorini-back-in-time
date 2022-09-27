@@ -40,17 +40,8 @@ public class Item : MonoBehaviour
                         player.ActivePowerup = other.gameObject.AddComponent<ShrinkPowerUp>();
                         break;
                     case "MagnetPowerup":
-                        Debug.Log("Magnet activated!");
-                        GameObject MagnetObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                        MagnetObject.tag = "MagnetPowerup";
-                        MagnetObject.GetComponent<SphereCollider>().isTrigger = true;
-                        MagnetObject.GetComponent<SphereCollider>().radius = 1.5f;
-                        MagnetObject.transform.parent = other.transform;
-                        MagnetObject.transform.localPosition = Vector3.zero;
-                        MagnetObject.transform.localScale = 2f * MagnetObject.GetComponent<SphereCollider>().radius * Vector3.one;
-                        MagnetPowerUp powerup = MagnetObject.AddComponent<MagnetPowerUp>();
-                        Destroy(MagnetObject.GetComponent<MeshRenderer>());
-                        player.ActivePowerup = powerup;
+                        Debug.Log("Magnet activated!");           
+                        player.ActivePowerup = other.gameObject.AddComponent<MagnetPowerUp>();
                         break;
                 }
             }
