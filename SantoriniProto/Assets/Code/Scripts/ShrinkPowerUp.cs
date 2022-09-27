@@ -7,7 +7,6 @@ using System.Linq;
 [Serializable]
 public class ShrinkPowerUp : PowerUp
 {
-    private GameObject gizmoBox;
     // Start is called before the first frame update
     override public byte Attack(EnemyStatus enemy)
     {
@@ -36,14 +35,15 @@ public class ShrinkPowerUp : PowerUp
     private void Awake()
     {
         LifeTime = 10f;
-        gizmoBox = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        gizmoBox.transform.parent = gameObject.transform;
-        gizmoBox.transform.localPosition = Vector3.zero;
-        gizmoBox.transform.localScale *= 10f;
-        gizmoBox.layer = LayerMask.NameToLayer("Player");
-        gizmoBox.tag = "Player";
-        gizmoBox.GetComponent<BoxCollider>().isTrigger = true;
-        Destroy(gizmoBox.GetComponent<MeshRenderer>());
+        PowerupObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        PowerupObject.transform.parent = gameObject.transform;
+        PowerupObject.transform.localPosition = Vector3.zero;
+        PowerupObject.transform.localScale *= 10f;
+        PowerupObject.layer = LayerMask.NameToLayer("Player");
+        PowerupObject.tag = "ShrinkPowerup";
+        PowerupObject.GetComponent<BoxCollider>().isTrigger = true;
+        Destroy(PowerupObject.GetComponent<MeshRenderer>());
+        Destroyer = StartCoroutine(DestroyPowerupCoroutine(LifeTime));
     }
 
     // Update is called once per frame
@@ -52,9 +52,9 @@ public class ShrinkPowerUp : PowerUp
 
         if (Input.GetKeyDown(KeyCode.F))
         {
-            Collider[] nearestEnemies = Physics.OverlapBox( gizmoBox.transform.position,
-                                                            gizmoBox.transform.localScale/2,
-                                                            gizmoBox.transform.rotation,
+            Collider[] nearestEnemies = Physics.OverlapBox( PowerupObject.transform.position,
+                                                            PowerupObject.transform.localScale/2,
+                                                            PowerupObject.transform.rotation,
                                                             gameObject.GetComponent<PlayerStatus>().EnemyLayerMask, 
                                                             QueryTriggerInteraction.Collide);
             UnityEngine.Debug.Log("Nemici trovati: " + nearestEnemies.Length);
@@ -65,7 +65,7 @@ public class ShrinkPowerUp : PowerUp
                 UnityEngine.Debug.Log("Nemici trovati: " + nearestEnemies.Length);
                 GameObject magicBeam = new GameObject("Beam");
                 magicBeam.transform.parent = gameObject.transform;
-                gizmoBox.transform.localPosition = Vector3.zero;
+                PowerupObject.transform.localPosition = Vector3.zero;
                 LineRenderer beamRenderer = magicBeam.AddComponent<LineRenderer>();
 
                 beamRenderer.useWorldSpace = true;

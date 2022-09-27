@@ -33,6 +33,12 @@ public class Item : MonoBehaviour
             else if (IsPowerup)
             {
                 PlayerStatus player = other.gameObject.GetComponent<PlayerStatus>();
+                if (player.ActivePowerup != null)
+                {
+                    StopCoroutine(player.ActivePowerup.Destroyer);
+                    Destroy(player.ActivePowerup.PowerupObject);
+                    Destroy(player.ActivePowerup);
+                }
                 switch (tag)
                 {
                     case "ShrinkPowerup":

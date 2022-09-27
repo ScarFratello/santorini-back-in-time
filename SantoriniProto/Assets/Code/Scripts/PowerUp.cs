@@ -6,18 +6,21 @@ using UnityEngine;
 public abstract class PowerUp : MonoBehaviour, IPowerUp
 {
     public float LifeTime;
+    public Coroutine Destroyer;
+    public GameObject PowerupObject;
 
     public abstract byte Attack(EnemyStatus enemy);
 
     public abstract byte Defend();
+
+    public IEnumerator DestroyPowerupCoroutine(float time)
+    {
+        yield return new WaitForSeconds(time);
+        Destroy(PowerupObject);
+        Destroy(this);
+    }
     void FixedUpdate()
     {
-        if (LifeTime >= 0f) LifeTime -= Time.deltaTime;
-        else
-        {
-            gameObject.GetComponent<PlayerStatus>().ActivePowerup = null;
-            Destroy(this);
-        }
     }
 
 }

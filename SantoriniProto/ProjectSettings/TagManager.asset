@@ -5,11 +5,11 @@ TagManager:
   serializedVersion: 2
   tags:
   - Enemy
-  - Coin
   - Obstacle
   - Platform
   - ShrinkPowerup
   - MagnetPowerup
+  - Collectable
   layers:
   - Default
   - TransparentFX

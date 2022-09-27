@@ -63,7 +63,9 @@ public class PlayerInteraction : MonoBehaviour
         {
             timer += Time.deltaTime;
             entityMaterial.color = Color.Lerp(Color.red, originalColor, timer/duration);
-            // meshRenderer.material = entityMaterial
+            Debug.Log(entityMaterial.color);
+            meshRenderer.material = entityMaterial;
+            
             yield return null;
         }
         entityMaterial.color = originalColor;
