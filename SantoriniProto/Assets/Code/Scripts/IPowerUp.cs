@@ -1,8 +1,7 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+
 public interface IPowerUp
 {
-    byte Activate();
+    byte Attack(EnemyStatus entity);
+    byte Defend();
 }

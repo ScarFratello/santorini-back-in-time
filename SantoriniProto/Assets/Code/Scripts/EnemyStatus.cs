@@ -4,17 +4,15 @@ using UnityEngine;
 
 public class EnemyStatus : MonoBehaviour
 {
-    public BoxCollider TopCollider;
-    public CapsuleCollider BodyCollider;
+    public byte LifePoints;
     public LayerMask PlayerLayerMask;
     public bool IsStompable;
     public bool IsHittable;
     public byte PrimaryAttackPoints;
     public byte SecondaryAttackPoints;
     private PlayerStatus Player;
-    public CharacterController EnemyController;
-    [SerializeField] private byte LifePoints;
-
+    private RaycastHit Stomper;
+    private RaycastHit Hitter;
     [SerializeField] private bool IsEnemy;
     [SerializeField] private bool IsAllied;
 
@@ -28,12 +26,23 @@ public class EnemyStatus : MonoBehaviour
 
     public void TakeDamage(byte damage) 
     {
-        LifePoints -= damage;
+        if ((LifePoints -= damage) == 0) StartCoroutine(DestroyCoroutine());
     }
 
-    public void Damage(PlayerStatus player)
+    public void DoDamage(PlayerStatus player)
     {
         player.TakeDamage(PrimaryAttackPoints);
+    }
+
+    private IEnumerator DestroyCoroutine()
+    {
+        gameObject.GetComponent<Collider>().isTrigger = true;
+        while(gameObject.transform.localScale.x > 0)
+        {
+            gameObject.transform.localScale -= 5f * Time.deltaTime * Vector3.one;
+            yield return null;
+        }
+        Destroy(gameObject);
     }
 
 
@@ -43,21 +52,6 @@ public class EnemyStatus : MonoBehaviour
         
     }
 
-    private void FixedUpdate()
-    {
-        if (Physics.Raycast(gameObject.transform.position, Vector3.up, EnemyController.height / 2 + 0.05f, PlayerLayerMask, QueryTriggerInteraction.Ignore))
-        {
-            if (IsStompable)
-            {
-                if (TakeDamage() == 0) Destroy(gameObject);
-            }
-            else
-            {
-                Damage(PlayerCharacter.gameObject)
-            }
-            
-        }
-    }
     // Update is called once per frame
     void Update()
     {

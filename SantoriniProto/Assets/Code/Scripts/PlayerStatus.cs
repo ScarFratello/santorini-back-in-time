@@ -1,12 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class PlayerStatus : MonoBehaviour
 {
-    public IPowerUp ActivePowerup;
+    public PowerUp ActivePowerup;
+    public LayerMask EnemyLayerMask;
     public byte LifePoints;
     private byte AttackPoints;
+    
+
 
     public PlayerStatus()
     {
@@ -14,14 +19,14 @@ public class PlayerStatus : MonoBehaviour
     }
     public void TakeDamage(byte damage)
     {
-        if (ActivePowerup == null)  LifePoints -= damage;
-        else                        ActivePowerup.Activate();
-
+        if (ActivePowerup == null)
+            if ((LifePoints -= damage) == 0) Destroy(gameObject);
+        else                        ActivePowerup.Defend();
     }
     public void DoDamage(EnemyStatus enemy)
     {
-        if (ActivePowerup == null)  enemy.TakeDamage(1);
-        else                        enemy.TakeDamage(ActivePowerup.Activate());
+        if (ActivePowerup == null) enemy.TakeDamage(1);
+        else enemy.TakeDamage(ActivePowerup.Attack(enemy));
     }
     // Start is called before the first frame update
     void Start()

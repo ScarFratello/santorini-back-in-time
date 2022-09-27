@@ -3,7 +3,13 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Enemy
+  - Coin
+  - Obstacle
+  - Platform
+  - ShrinkPowerup
+  - MagnetPowerup
   layers:
   - Default
   - TransparentFX
@@ -11,15 +17,15 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - Ground
+  - Static Platforms
+  - Moving Platforms
+  - Coins
+  - Collectables
+  - Enemies
+  - Obstacles
+  - Powerups
   - 
   - 
   - 
