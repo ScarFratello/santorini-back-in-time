@@ -34,7 +34,7 @@ public class MovementInputSystem : MonoBehaviour
     [Header("Jump")]
     [SerializeField] private float jumpForce = 3f, highJumpForce = 1f;
     private float gravity = 3f;
-    private float vSpeed = 0f; // current vertical velocity
+    public float vSpeed = 0f; // current vertical velocity
     private bool isGroundedAfterJump = false;
     [Header("Collision")]
     private bool isHittedEnemy;
@@ -44,9 +44,9 @@ public class MovementInputSystem : MonoBehaviour
 
     private void Awake()
     {
-        routeToGo = 0;
+        routeToGo = 2;
         //il player comincia a muoversi dal secondo Control Point
-        tParam = 1f;
+        tParam = 0f;
 
         controls = new Controls();
         controls.Gameplay.Enable();
@@ -74,7 +74,7 @@ public class MovementInputSystem : MonoBehaviour
 
     private void FixedUpdate()
     {
-        direction = new Vector2(controls.Gameplay.Move.ReadValue<Vector2>().x, 0f);
+        direction = new Vector2(controls.Gameplay.Move.ReadValue<Vector2>().x, transform.position.z);
 
         Vector3 p0 = routes[routeToGo].GetChild(0).position;
         Vector3 p1 = routes[routeToGo].GetChild(1).position;
@@ -149,7 +149,14 @@ public class MovementInputSystem : MonoBehaviour
                     {
                         if (isHittedEnemy)
                         {
-                            tParam += (-moveDir.x -lastDir.x) * enemyPushForce;
+                            if (lastDir.magnitude > .15f)
+                            {
+                                tParam += -lastDir.x * enemyPushForce;
+                            }
+                            else
+                            {
+                                tParam += (-moveDir.x - lastDir.x) * enemyPushForce;
+                            }
                             TParamLoop();
                             isHittedEnemy = false;
                         }

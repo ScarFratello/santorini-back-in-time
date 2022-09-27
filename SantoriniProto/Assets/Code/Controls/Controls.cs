@@ -70,7 +70,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""id"": ""e4fba10f-c17e-4b73-acc7-e21dab3526b7"",
                     ""path"": ""2DVector"",
                     ""interactions"": """",
-                    ""processors"": ""InvertVector2(invertY=false)"",
+                    ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Move"",
                     ""isComposite"": true,
