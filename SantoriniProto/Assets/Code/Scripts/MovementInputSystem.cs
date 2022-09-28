@@ -246,7 +246,7 @@ public class MovementInputSystem : MonoBehaviour
         {
             //normalHit = hit.normal.x + hit.normal.z;
             normalHit = Vector3.Dot(transform.forward, hit.normal);
-            if (hit.gameObject.layer == LayerMask.NameToLayer("Enemies"))
+            if (hit.gameObject.layer == LayerMask.NameToLayer("Enemy"))
             {
                 isHittedEnemy = true;
                 StartCoroutine(CanRotate());
