@@ -149,12 +149,14 @@ public class MovementInputSystem : MonoBehaviour
                     {
                         if (isHittedEnemy)
                         {
+
                             if (lastDir.magnitude > .15f)
                             {
                                 tParam += -lastDir.x * enemyPushForce;
                             }
                             else
                             {
+
                                 tParam += (-moveDir.x - lastDir.x) * enemyPushForce;
                             }
                             TParamLoop();
@@ -246,10 +248,13 @@ public class MovementInputSystem : MonoBehaviour
         {
             //normalHit = hit.normal.x + hit.normal.z;
             normalHit = Vector3.Dot(transform.forward, hit.normal);
-            if (hit.gameObject.layer == LayerMask.NameToLayer("Enemies"))
+
+            if(hit.gameObject.layer == LayerMask.NameToLayer("Enemies"))
             {
                 isHittedEnemy = true;
                 StartCoroutine(CanRotate());
+                EnemyStatus enemy = hit.gameObject.GetComponent<EnemyStatus>();
+                enemy.DoDamage(gameObject.GetComponent<PlayerStatus>());
             }
             canCheckNormal = false;
             //Debug.Log("forward " + transform.forward + "normal " + hit.normal + "normal hit" + normalHit);
