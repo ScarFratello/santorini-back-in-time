@@ -14,6 +14,7 @@ public class StepOnEnemyJump : MonoBehaviour
     {
         Vector3 down = transform.TransformDirection(Vector3.down);
 
+
         if (Physics.Raycast(transform.position, down, out enemyHit, .3f, enemyMask))
         {
             mis.vSpeed = stepOnJumpForce;
