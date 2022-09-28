@@ -251,6 +251,8 @@ public class MovementInputSystem : MonoBehaviour
             {
                 isHittedEnemy = true;
                 StartCoroutine(CanRotate());
+                EnemyStatus enemy = hit.gameObject.GetComponent<EnemyStatus>();
+                enemy.DoDamage(gameObject.GetComponent<PlayerStatus>());
             }
             canCheckNormal = false;
             //Debug.Log("forward " + transform.forward + "normal " + hit.normal + "normal hit" + normalHit);

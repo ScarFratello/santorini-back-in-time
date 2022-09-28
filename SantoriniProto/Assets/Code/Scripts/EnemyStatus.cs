@@ -26,12 +26,19 @@ public class EnemyStatus : MonoBehaviour
 
     public void TakeDamage(byte damage) 
     {
-        if ((LifePoints -= damage) == 0) StartCoroutine(DestroyCoroutine());
+        StartCoroutine(AnimationManager.HitAnimationCoroutine(gameObject, Vector3.up));
+        if ((LifePoints -= damage) == 0)
+        {
+            StopAllCoroutines();
+            StartCoroutine(DestroyCoroutine());
+        }
+            
     }
 
     public void DoDamage(PlayerStatus player)
     {
         player.TakeDamage(PrimaryAttackPoints);
+
     }
 
     private IEnumerator DestroyCoroutine()

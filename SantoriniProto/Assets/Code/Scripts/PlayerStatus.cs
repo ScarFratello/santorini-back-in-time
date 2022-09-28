@@ -19,6 +19,7 @@ public class PlayerStatus : MonoBehaviour
     }
     public void TakeDamage(byte damage)
     {
+        StartCoroutine(AnimationManager.HitAnimationCoroutine(gameObject, Vector3.up));
         if (ActivePowerup == null)
             if ((LifePoints -= damage) == 0) Destroy(gameObject);
         else                        ActivePowerup.Defend();
