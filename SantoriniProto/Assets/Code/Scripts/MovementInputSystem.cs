@@ -33,6 +33,8 @@ public class MovementInputSystem : MonoBehaviour
     [SerializeField] private float jumpForce = 3f, highJumpForce = 1f;
     private float gravity = 3f;
     private float vSpeed = 0f; // current vertical velocity
+    // private Vector3 velocity;
+    // vspeed = velocity.y
     private bool isGroundedAfterJump = false;
     #endregion
 
@@ -195,7 +197,7 @@ public class MovementInputSystem : MonoBehaviour
             }
         }
         
-        Debug.Log("vSpeed è: " + vSpeed);
+        //Debug.Log("vSpeed è: " + vSpeed);
 
         MoveToPoint(objectPosition, vSpeed);
     }
