@@ -35,13 +35,11 @@ public class MovementInputSystem : MonoBehaviour
     [SerializeField] private float jumpForce = 3f, highJumpForce = 1f;
     private float gravity = 3f;
     public float vSpeed = 0f; // current vertical velocity
-    // private Vector3 velocity;
-    // vspeed = velocity.y
     private bool isGroundedAfterJump = false;
     [Header("Collision")]
     private bool isHittedEnemy;
     [SerializeField]
-    private float enemyPushForce = .5f;
+    private float enemyPushForce = .3f;
     #endregion
 
     private void Awake()
@@ -151,14 +149,15 @@ public class MovementInputSystem : MonoBehaviour
                     {
                         if (isHittedEnemy)
                         {
-                            if(lastDir.magnitude > .15f)
+                            if (lastDir.magnitude > .15f)
                             {
                                 tParam += -lastDir.x * enemyPushForce;
                             }
                             else
                             {
-                                tParam += (-lastDir.x - moveDir.x) * enemyPushForce;
+                                tParam += (-moveDir.x - lastDir.x) * enemyPushForce;
                             }
+                            TParamLoop();
                             isHittedEnemy = false;
                         }
                         else if(lastDir.x != moveDir.x)
@@ -187,7 +186,7 @@ public class MovementInputSystem : MonoBehaviour
             }
         }
         
-        //Debug.Log("vSpeed è: " + vSpeed);
+        Debug.Log("vSpeed è: " + vSpeed);
 
         MoveToPoint(objectPosition, vSpeed);
     }
@@ -247,7 +246,7 @@ public class MovementInputSystem : MonoBehaviour
         {
             //normalHit = hit.normal.x + hit.normal.z;
             normalHit = Vector3.Dot(transform.forward, hit.normal);
-            if(hit.gameObject.layer == LayerMask.NameToLayer("Enemies"))
+            if (hit.gameObject.layer == LayerMask.NameToLayer("Enemy"))
             {
                 isHittedEnemy = true;
                 StartCoroutine(CanRotate());
@@ -264,7 +263,7 @@ public class MovementInputSystem : MonoBehaviour
     IEnumerator CanRotate()
     {
         canRotate = false;
-        yield return new WaitForSeconds(.5f);
+        yield return new WaitForSeconds(.3f);
         canRotate = true;
     }
 
