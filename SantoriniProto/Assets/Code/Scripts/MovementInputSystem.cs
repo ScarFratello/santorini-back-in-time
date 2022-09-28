@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -27,22 +29,26 @@ public class MovementInputSystem : MonoBehaviour
 
     [Header("Rotation")]
     [SerializeField] [Range(0, 1f)] private float turnSmoothTime = .1f;
-    private bool canRotate;
+    private bool canRotate = true;
 
     [Header("Jump")]
     [SerializeField] private float jumpForce = 3f, highJumpForce = 1f;
     private float gravity = 3f;
-    private float vSpeed = 0f; // current vertical velocity
+    public float vSpeed = 0f; // current vertical velocity
     // private Vector3 velocity;
     // vspeed = velocity.y
     private bool isGroundedAfterJump = false;
+    [Header("Collision")]
+    private bool isHittedEnemy;
+    [SerializeField]
+    private float enemyPushForce = .5f;
     #endregion
 
     private void Awake()
     {
-        routeToGo = 0;
+        routeToGo = 2;
         //il player comincia a muoversi dal secondo Control Point
-        tParam = 1f;
+        tParam = 0f;
 
         controls = new Controls();
         controls.Gameplay.Enable();
@@ -70,7 +76,7 @@ public class MovementInputSystem : MonoBehaviour
 
     private void FixedUpdate()
     {
-        direction = new Vector2(controls.Gameplay.Move.ReadValue<Vector2>().x, 0f);
+        direction = new Vector2(controls.Gameplay.Move.ReadValue<Vector2>().x, transform.position.z);
 
         Vector3 p0 = routes[routeToGo].GetChild(0).position;
         Vector3 p1 = routes[routeToGo].GetChild(1).position;
@@ -137,15 +143,25 @@ public class MovementInputSystem : MonoBehaviour
                     tParam += moveDir.x * speedModifier;
 
                     lastDir = moveDir;
-
-                    canRotate = true;
                 }
                 else
                 {
                     //Sta urtando
                     if (Mathf.Sign(normalHit) < 0f)
                     {
-                        if(lastDir.x != moveDir.x)
+                        if (isHittedEnemy)
+                        {
+                            if(lastDir.magnitude > .15f)
+                            {
+                                tParam += -lastDir.x * enemyPushForce;
+                            }
+                            else
+                            {
+                                tParam += (-lastDir.x - moveDir.x) * enemyPushForce;
+                            }
+                            isHittedEnemy = false;
+                        }
+                        else if(lastDir.x != moveDir.x)
                         {
                             tParam += moveDir.x * speedModifier;
                         }
@@ -159,33 +175,7 @@ public class MovementInputSystem : MonoBehaviour
             }
             else
             {
-                //se supera la fine di quella determinata route in cui ci troviamo
-                if (tParam > 1)
-                {
-                    tParam = 0f;
-
-                    routeToGo += 1;
-
-                    if (routeToGo > routes.Length - 1)
-                    {
-                        //vediamo che fare quando arriva alla fine
-                        Debug.Log("Sei alla fine della route");
-                    }
-                }
-
-                //se torna indietro la route si ricollega alla route precedente
-                else if (tParam < 0)
-                {
-                    tParam = 1f;
-
-                    routeToGo -= 1;
-
-                    if (routeToGo > routes.Length - routes.Length)
-                    {
-                        //vediamo che fare quando arriva all'inizio
-                        Debug.Log("Sei all'inizio della route");
-                    }
-                }
+                TParamLoop();
             }
         }
 
@@ -220,20 +210,62 @@ public class MovementInputSystem : MonoBehaviour
         controller.Move(movDiff * speed * Time.deltaTime);
     }
 
+    private void TParamLoop()
+    {
+        //se supera la fine di quella determinata route in cui ci troviamo
+        if (tParam > 1)
+        {
+            tParam = 0f;
+
+            routeToGo += 1;
+
+            if (routeToGo > routes.Length - 1)
+            {
+                //vediamo che fare quando arriva alla fine
+                Debug.Log("Sei alla fine della route");
+            }
+        }
+
+        //se torna indietro la route si ricollega alla route precedente
+        else if (tParam < 0)
+        {
+            tParam = 1f;
+
+            routeToGo -= 1;
+
+            if (routeToGo > routes.Length - routes.Length)
+            {
+                //vediamo che fare quando arriva all'inizio
+                Debug.Log("Sei all'inizio della route");
+            }
+        }
+    }
+
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
         if ((controller.collisionFlags & CollisionFlags.Sides) != 0 && canCheckNormal)
         {
             //normalHit = hit.normal.x + hit.normal.z;
             normalHit = Vector3.Dot(transform.forward, hit.normal);
+            if(hit.gameObject.layer == LayerMask.NameToLayer("Enemies"))
+            {
+                isHittedEnemy = true;
+                StartCoroutine(CanRotate());
+            }
             canCheckNormal = false;
-            canRotate = false;
             //Debug.Log("forward " + transform.forward + "normal " + hit.normal + "normal hit" + normalHit);
         }
         else
         {
             canCheckNormal = true;
         }
+    }
+
+    IEnumerator CanRotate()
+    {
+        canRotate = false;
+        yield return new WaitForSeconds(.5f);
+        canRotate = true;
     }
 
     void OnDrawGizmosSelected()
