@@ -35,7 +35,9 @@ public class MovementInputSystem : MonoBehaviour
     [SerializeField] private float jumpForce = 3f, highJumpForce = 1f;
     private float gravity = 3f;
     public float vSpeed = 0f; // current vertical velocity
-    private bool isGroundedAfterJump = false;
+    [SerializeField]
+    private int howManyJump = 2;
+    private int jumpCounter = 0;
     [Header("Collision")]
     private bool isHittedEnemy;
     [SerializeField]
@@ -57,68 +59,37 @@ public class MovementInputSystem : MonoBehaviour
     public void Jump(InputAction.CallbackContext context)
     {
         //context.performed è quando premiamo il tasto
-        if (context.performed && controller.isGrounded)
+        if (context.performed && jumpCounter < howManyJump)
         {
             vSpeed = jumpForce;
+            jumpCounter++;
         }
     }
 
     public void HighJump(InputAction.CallbackContext context)
     {
         //context.performed è quando premiamo il tasto
-        if (context.performed && controller.isGrounded)
+        if (context.performed && jumpCounter < howManyJump)
         {
             vSpeed = jumpForce + highJumpForce;
+            jumpCounter++;
         }
+    }
+
+    private void Update()
+    {
+        direction = new Vector2(controls.Gameplay.Move.ReadValue<Vector2>().x, transform.position.z);
     }
 
     private void FixedUpdate()
     {
-        direction = new Vector2(controls.Gameplay.Move.ReadValue<Vector2>().x, transform.position.z);
-
         Vector3 p0 = routes[routeToGo].GetChild(0).position;
         Vector3 p1 = routes[routeToGo].GetChild(1).position;
         Vector3 p2 = routes[routeToGo].GetChild(2).position;
         Vector3 p3 = routes[routeToGo].GetChild(3).position;
 
         #region -SetAnimation-
-        if (!controller.isGrounded)
-        {
-            //Animate("jumpNo1");
-            //se non tocca il suolo è pronto per far partire l'animazione non appena lo toccherà
-            isGroundedAfterJump = true;
-        }
-        else
-        {
-            //qui parte l'animazione se prima non stava toccando il suolo
-            if (isGroundedAfterJump)
-            {
-                //Animate("postJumpNo1");
-                isGroundedAfterJump = false;
-            }
-            else
-            {
-                if (direction.magnitude >= .5f)
-                {
-                    //speedAnim = direction.magnitude;
-                    //anim.SetFloat("speed", speedAnim);
-                    //Animate("runNo1");
-                }
-
-                else if (direction.magnitude > .15f)
-                {
-                    //speedAnim = direction.magnitude;
-                    //anim.SetFloat("speed", speedAnim);
-                    //Animate("walkNo1");
-                }
-
-                else
-                {
-                    //Animate("idleNo1");
-                }
-            }
-
-        }
+        
         #endregion
 
         if (direction.magnitude > .15f)
@@ -141,6 +112,16 @@ public class MovementInputSystem : MonoBehaviour
                     tParam += moveDir.x * speedModifier;
 
                     lastDir = moveDir;
+
+                    canCheckNormal = true;
+
+                    if (!isHittedEnemy)
+                    {
+                        if (!canRotate)
+                        {
+                            canRotate = true;
+                        }
+                    }
                 }
                 else
                 {
@@ -149,22 +130,20 @@ public class MovementInputSystem : MonoBehaviour
                     {
                         if (isHittedEnemy)
                         {
-
                             if (lastDir.magnitude > .15f)
                             {
                                 tParam += -lastDir.x * enemyPushForce;
                             }
                             else
                             {
-
                                 tParam += (-moveDir.x - lastDir.x) * enemyPushForce;
                             }
                             TParamLoop();
-                            isHittedEnemy = false;
                         }
                         else if(lastDir.x != moveDir.x)
                         {
-                            tParam += moveDir.x * speedModifier;
+                            canRotate = false;
+                            tParam += -lastDir.x * speedModifier;
                         }
                     }
                 }
@@ -187,8 +166,6 @@ public class MovementInputSystem : MonoBehaviour
                 vSpeed -= gravity * Time.deltaTime;
             }
         }
-        
-        Debug.Log("vSpeed è: " + vSpeed);
 
         MoveToPoint(objectPosition, vSpeed);
     }
@@ -248,20 +225,19 @@ public class MovementInputSystem : MonoBehaviour
         {
             //normalHit = hit.normal.x + hit.normal.z;
             normalHit = Vector3.Dot(transform.forward, hit.normal);
-
-            if(hit.gameObject.layer == LayerMask.NameToLayer("Enemies"))
+            if (hit.gameObject.layer == LayerMask.NameToLayer("Enemies"))
             {
                 isHittedEnemy = true;
                 StartCoroutine(CanRotate());
-                EnemyStatus enemy = hit.gameObject.GetComponent<EnemyStatus>();
-                enemy.DoDamage(gameObject.GetComponent<PlayerStatus>());
             }
             canCheckNormal = false;
-            //Debug.Log("forward " + transform.forward + "normal " + hit.normal + "normal hit" + normalHit);
+            Debug.Log("forward " + transform.forward
+                + "normal " + hit.normal + "normal hit" + normalHit);
         }
-        else
+
+        if (controller.isGrounded)
         {
-            canCheckNormal = true;
+            jumpCounter = 0;
         }
     }
 
@@ -269,6 +245,7 @@ public class MovementInputSystem : MonoBehaviour
     {
         canRotate = false;
         yield return new WaitForSeconds(.3f);
+        isHittedEnemy = false;
         canRotate = true;
     }
 

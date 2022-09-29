@@ -667,7 +667,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1015499191777110}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -702,70 +702,70 @@ MonoBehaviour:
   _waves:
   - amplitude: 0.050900437
     direction: -157.6966
-    wavelength: 0.49146843
+    wavelength: 2.9488106
     origin:
       x: 0
       y: 0
     onmiDir: 0
   - amplitude: 0.057572123
     direction: -151.68127
-    wavelength: 0.57013965
+    wavelength: 3.420838
     origin:
       x: 0
       y: 0
     onmiDir: 0
   - amplitude: 0.078756735
     direction: -248.20753
-    wavelength: 0.50858116
+    wavelength: 3.0514867
     origin:
       x: 0
       y: 0
     onmiDir: 0
   - amplitude: 0.07329328
     direction: -157.03645
-    wavelength: 0.74353474
+    wavelength: 4.461209
     origin:
       x: 0
       y: 0
     onmiDir: 0
   - amplitude: 0.07716175
     direction: -109.31301
-    wavelength: 0.8687705
+    wavelength: 5.2126226
     origin:
       x: 0
       y: 0
     onmiDir: 0
   - amplitude: 0.10267291
     direction: -185.72478
-    wavelength: 1.3457693
+    wavelength: 8.0746155
     origin:
       x: 0
       y: 0
     onmiDir: 0
   - amplitude: 0.08917975
     direction: -95.83502
-    wavelength: 0.73598963
+    wavelength: 4.415938
     origin:
       x: 0
       y: 0
     onmiDir: 0
   - amplitude: 0.14036651
     direction: -189.7634
-    wavelength: 0.98751235
+    wavelength: 5.925074
     origin:
       x: 0
       y: 0
     onmiDir: 0
   - amplitude: 0.12075558
     direction: -144.55301
-    wavelength: 0.86985964
+    wavelength: 5.2191577
     origin:
       x: 0
       y: 0
     onmiDir: 0
   - amplitude: 0.12427365
     direction: -116.98241
-    wavelength: 1.7194502
+    wavelength: 10.316701
     origin:
       x: 0
       y: 0
