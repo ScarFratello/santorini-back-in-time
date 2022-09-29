@@ -46,6 +46,7 @@ public class MovementInputSystem : MonoBehaviour
 
     private void Awake()
     {
+        direction = new Vector2(transform.position.x, transform.position.z);
         routeToGo = 2;
         //il player comincia a muoversi dal secondo Control Point
         tParam = 0f;

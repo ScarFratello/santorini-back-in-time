@@ -18,13 +18,8 @@ public class StepOnEnemyJump : MonoBehaviour
     private void Update()
     {
         Vector3 down = transform.TransformDirection(Vector3.down);
-<<<<<<< Updated upstream
-
-
-=======
         RaycastHit enemyHit;
         EnemyStatus enemyStatus;
->>>>>>> Stashed changes
         if (Physics.Raycast(transform.position, down, out enemyHit, .3f, enemyMask))
         {
             mis.vSpeed = stepOnJumpForce;
