@@ -31,7 +31,7 @@ public class MovementInputSystem : MonoBehaviour
     private Vector2 lastDir;
 
     [Header("Rotation")]
-    [SerializeField] [Range(0, 1f)] private float turnSmoothTime = .1f;
+    [SerializeField][Range(0, 1f)] private float turnSmoothTime = .1f;
     private bool canRotate = true;
 
     [Header("Jump")]
@@ -60,7 +60,7 @@ public class MovementInputSystem : MonoBehaviour
         //il player comincia a muoversi dal secondo Control Point
         tParam = 0f;
         routesTransform = new Transform[routes.transform.childCount];
-        for (int i=0; i< routes.transform.childCount; i++) 
+        for (int i = 0; i < routes.transform.childCount; i++)
         {
             routesTransform[i] = routes.transform.GetChild(i).transform;
         }
@@ -71,7 +71,7 @@ public class MovementInputSystem : MonoBehaviour
     }
     private IEnumerator JumpWaitCoroutine(float highJumpForce)
     {
-        yield return new WaitForSeconds(10f/30f);
+        yield return new WaitForSeconds(10f / 30f);
         vSpeed = jumpForce + highJumpForce;
     }
     public void Jump(InputAction.CallbackContext context)
@@ -102,6 +102,9 @@ public class MovementInputSystem : MonoBehaviour
     {
         direction = new Vector2(controls.Gameplay.Move.ReadValue<Vector2>().x, transform.position.z);
     }
+
+    private void FixedUpdate()
+    {
 
         Vector3 p0 = routesTransform[routeToGo].GetChild(0).position;
         Vector3 p1 = routesTransform[routeToGo].GetChild(1).position;
@@ -163,7 +166,7 @@ public class MovementInputSystem : MonoBehaviour
                             }
                             TParamLoop();
                         }
-                        else if(lastDir.x != moveDir.x)
+                        else if (lastDir.x != moveDir.x)
                         {
                             canRotate = false;
                             tParam += -lastDir.x * speedModifier;
@@ -181,7 +184,7 @@ public class MovementInputSystem : MonoBehaviour
                 TParamLoop();
             }
         }
-        
+
         if (vSpeed > -5)
         {
             if (vSpeed > 0) isFalling = false;
@@ -210,7 +213,7 @@ public class MovementInputSystem : MonoBehaviour
         {
             transform.rotation = Quaternion.LookRotation(movRot);
         }
-        
+
         controller.Move(movDiff * speed * Time.deltaTime);
     }
 
@@ -244,24 +247,22 @@ public class MovementInputSystem : MonoBehaviour
             }
         }
     }
-
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
         if ((controller.collisionFlags & CollisionFlags.Sides) != 0 && canCheckNormal)
         {
             //normalHit = hit.normal.x + hit.normal.z;
             normalHit = Vector3.Dot(transform.forward, hit.normal);
-        if (hit.gameObject.layer == LayerMask.NameToLayer("Enemies"))
-        {
-            isHittedEnemy = true;
-            StartCoroutine(CanRotate());
-            EnemyStatus enemy = hit.gameObject.GetComponent<EnemyStatus>();
-            enemy.DoDamage(gameObject.GetComponent<PlayerStatus>());
-        }
+            if (hit.gameObject.layer == LayerMask.NameToLayer("Enemies"))
+            {
+                isHittedEnemy = true;
+                StartCoroutine(CanRotate());
+                EnemyStatus enemy = hit.gameObject.GetComponent<EnemyStatus>();
+                enemy.DoDamage(gameObject.GetComponent<PlayerStatus>());
+            }
         }
             canCheckNormal = false;
             //Debug.Log("forward " + transform.forward + "normal " + hit.normal + "normal hit" + normalHit);
-        }
 
         if (controller.isGrounded)
         {
