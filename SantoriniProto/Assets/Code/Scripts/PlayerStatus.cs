@@ -4,30 +4,40 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class PlayerStatus : MonoBehaviour
+public class PlayerStatus : EntityStatus
 {
     public PowerUp ActivePowerup;
     public LayerMask EnemyLayerMask;
-    public byte LifePoints;
-    private byte AttackPoints;
+    public bool isHit;
     
-
-
     public PlayerStatus()
     {
         ActivePowerup = null;
     }
-    public void TakeDamage(byte damage)
+    override public void TakeDamage(sbyte damage)
     {
-        StartCoroutine(AnimationManager.HitAnimationCoroutine(gameObject, Vector3.up));
+        if (isHit) return;
+
+        StartCoroutine(AnimationManager.PlayerHitAnimationCoroutine(this));
         if (ActivePowerup == null)
-            if ((LifePoints -= damage) == 0) Destroy(gameObject);
-        else                        ActivePowerup.Defend();
+        {
+            if ((LifePoints -= damage) <= 0)
+            {
+                StopAllCoroutines();
+                StartCoroutine(AnimationManager.DestroyCoroutine(gameObject));
+            }
+        }
+        else ActivePowerup.Defend();
     }
-    public void DoDamage(EnemyStatus enemy)
+    override public void DoDamage(EntityStatus enemy)
     {
         if (ActivePowerup == null) enemy.TakeDamage(1);
         else enemy.TakeDamage(ActivePowerup.Attack(enemy));
+    }
+
+    public void RecoverHealth()
+    {
+        if (LifePoints < MaxLifePoints) LifePoints++;
     }
     // Start is called before the first frame update
     void Start()

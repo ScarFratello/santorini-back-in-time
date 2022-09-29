@@ -2,17 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyStatus : MonoBehaviour
+public class EnemyStatus : EntityStatus
 {
-    public byte LifePoints;
+    public int PointsIfKilled;
     public LayerMask PlayerLayerMask;
     public bool IsStompable;
     public bool IsHittable;
-    public byte PrimaryAttackPoints;
-    public byte SecondaryAttackPoints;
-    private PlayerStatus Player;
-    private RaycastHit Stomper;
-    private RaycastHit Hitter;
     [SerializeField] private bool IsEnemy;
     [SerializeField] private bool IsAllied;
 
@@ -21,36 +16,25 @@ public class EnemyStatus : MonoBehaviour
         IsEnemy = true;
         IsAllied = !IsEnemy;
         LifePoints = 2;
-        Player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerStatus>();
     }
 
-    public void TakeDamage(byte damage) 
+    override public void TakeDamage(sbyte damage) 
     {
-        StartCoroutine(AnimationManager.HitAnimationCoroutine(gameObject, Vector3.up));
-        if ((LifePoints -= damage) == 0)
+        StartCoroutine(AnimationManager.HitAnimationCoroutine(gameObject));
+        if ((LifePoints -= damage) <= 0)
         {
             StopAllCoroutines();
-            StartCoroutine(DestroyCoroutine());
+            StartCoroutine(AnimationManager.DestroyCoroutine(gameObject));
         }
             
     }
 
-    public void DoDamage(PlayerStatus player)
+    override public void DoDamage(EntityStatus player)
     {
-        player.TakeDamage(PrimaryAttackPoints);
+        player.TakeDamage(AttackPoints);
 
     }
 
-    private IEnumerator DestroyCoroutine()
-    {
-        gameObject.GetComponent<Collider>().isTrigger = true;
-        while(gameObject.transform.localScale.x > 0)
-        {
-            gameObject.transform.localScale -= 5f * Time.deltaTime * Vector3.one;
-            yield return null;
-        }
-        Destroy(gameObject);
-    }
 
 
     // Start is called before the first frame update
