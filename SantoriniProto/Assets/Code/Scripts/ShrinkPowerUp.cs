@@ -8,12 +8,12 @@ using System.Linq;
 public class ShrinkPowerUp : PowerUp
 {
     // Start is called before the first frame update
-    override public byte Attack(EnemyStatus enemy)
+    override public sbyte Attack(EntityStatus enemy)
     {
         return enemy.LifePoints;
     }
 
-    override public byte Defend()
+    override public sbyte Defend()
     {
         throw new NotSupportedException("This powerup has no defensive effect");
     }

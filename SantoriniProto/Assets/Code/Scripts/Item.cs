@@ -8,6 +8,7 @@ public class Item : MonoBehaviour
     public int Value;
     public bool IsCollectable;
     public bool IsPowerup;
+    public bool IsHealth;
 
     // Start is called before the first frame update
 
@@ -25,6 +26,7 @@ public class Item : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
+            PlayerStatus player = other.gameObject.GetComponent<PlayerStatus>();
             ScoreManager.GetInstance().AddPoints(Value);
             if (IsCollectable)
             {
@@ -32,7 +34,7 @@ public class Item : MonoBehaviour
             }
             else if (IsPowerup)
             {
-                PlayerStatus player = other.gameObject.GetComponent<PlayerStatus>();
+                
                 if (player.ActivePowerup != null)
                 {
                     StopCoroutine(player.ActivePowerup.Destroyer);
@@ -50,6 +52,10 @@ public class Item : MonoBehaviour
                         player.ActivePowerup = other.gameObject.AddComponent<MagnetPowerUp>();
                         break;
                 }
+            }
+            else if (IsHealth)
+            {
+                player.RecoverHealth();
             }
             Destroy(gameObject);
         }

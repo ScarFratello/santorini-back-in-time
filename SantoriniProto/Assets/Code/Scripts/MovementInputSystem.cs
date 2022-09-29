@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Events;
+using Unity.VisualScripting;
 
 public class MovementInputSystem : MonoBehaviour
 {
@@ -18,7 +20,8 @@ public class MovementInputSystem : MonoBehaviour
     Vector2 direction;
     //public float speedAnim = 0f;
     [Header("FollowPath")]
-    [SerializeField] private Transform[] routes;
+    [SerializeField] private GameObject routes;
+    private Transform[] routesTransform;
     private int routeToGo;
     private float tParam;
     private Vector3 objectPosition;
@@ -34,12 +37,19 @@ public class MovementInputSystem : MonoBehaviour
     [Header("Jump")]
     [SerializeField] private float jumpForce = 3f, highJumpForce = 1f;
     private float gravity = 3f;
+    private bool isFalling;
     public float vSpeed = 0f; // current vertical velocity
-    private bool isGroundedAfterJump = false;
+
     [Header("Collision")]
     private bool isHittedEnemy;
     [SerializeField]
     private float enemyPushForce = .3f;
+    [Header("Animation Events")]
+    public UnityEvent<float> OnUpdateSpeed;
+    public UnityEvent<bool> OnIsGrounded;
+    public UnityEvent<bool> OnIsFalling;
+    public UnityEvent OnJump;
+    public UnityEvent OnDoubleJump;
     #endregion
 
     private void Awake()
@@ -47,19 +57,29 @@ public class MovementInputSystem : MonoBehaviour
         routeToGo = 2;
         //il player comincia a muoversi dal secondo Control Point
         tParam = 0f;
-
+        routesTransform = new Transform[routes.transform.childCount];
+        for (int i=0; i< routes.transform.childCount; i++) 
+        {
+            routesTransform[i] = routes.transform.GetChild(i).transform;
+        }
         controls = new Controls();
         controls.Gameplay.Enable();
         controls.Gameplay.Jump.performed += Jump;
         controls.Gameplay.HighJump.performed += HighJump;
     }
-
+    private IEnumerator JumpWaitCoroutine(float highJumpForce)
+    {
+        yield return new WaitForSeconds(10f/30f);
+        vSpeed = jumpForce + highJumpForce;
+    }
     public void Jump(InputAction.CallbackContext context)
     {
         //context.performed è quando premiamo il tasto
         if (context.performed && controller.isGrounded)
         {
-            vSpeed = jumpForce;
+            StartCoroutine(JumpWaitCoroutine(0f));
+            Debug.Log("Salto");
+            OnJump.Invoke();
         }
     }
 
@@ -68,7 +88,9 @@ public class MovementInputSystem : MonoBehaviour
         //context.performed è quando premiamo il tasto
         if (context.performed && controller.isGrounded)
         {
-            vSpeed = jumpForce + highJumpForce;
+            StartCoroutine(JumpWaitCoroutine(highJumpForce));
+            Debug.Log("Salto alto");
+            OnJump.Invoke();
         }
     }
 
@@ -76,49 +98,16 @@ public class MovementInputSystem : MonoBehaviour
     {
         direction = new Vector2(controls.Gameplay.Move.ReadValue<Vector2>().x, transform.position.z);
 
-        Vector3 p0 = routes[routeToGo].GetChild(0).position;
-        Vector3 p1 = routes[routeToGo].GetChild(1).position;
-        Vector3 p2 = routes[routeToGo].GetChild(2).position;
-        Vector3 p3 = routes[routeToGo].GetChild(3).position;
+        Vector3 p0 = routesTransform[routeToGo].GetChild(0).position;
+        Vector3 p1 = routesTransform[routeToGo].GetChild(1).position;
+        Vector3 p2 = routesTransform[routeToGo].GetChild(2).position;
+        Vector3 p3 = routesTransform[routeToGo].GetChild(3).position;
 
         #region -SetAnimation-
-        if (!controller.isGrounded)
-        {
-            //Animate("jumpNo1");
-            //se non tocca il suolo è pronto per far partire l'animazione non appena lo toccherà
-            isGroundedAfterJump = true;
-        }
-        else
-        {
-            //qui parte l'animazione se prima non stava toccando il suolo
-            if (isGroundedAfterJump)
-            {
-                //Animate("postJumpNo1");
-                isGroundedAfterJump = false;
-            }
-            else
-            {
-                if (direction.magnitude >= .5f)
-                {
-                    //speedAnim = direction.magnitude;
-                    //anim.SetFloat("speed", speedAnim);
-                    //Animate("runNo1");
-                }
+        OnIsGrounded.Invoke(controller.isGrounded);
+        OnIsFalling.Invoke(isFalling);
+        OnUpdateSpeed.Invoke(Mathf.Abs(controls.Gameplay.Move.ReadValue<Vector2>().x));
 
-                else if (direction.magnitude > .15f)
-                {
-                    //speedAnim = direction.magnitude;
-                    //anim.SetFloat("speed", speedAnim);
-                    //Animate("walkNo1");
-                }
-
-                else
-                {
-                    //Animate("idleNo1");
-                }
-            }
-
-        }
         #endregion
 
         if (direction.magnitude > .15f)
@@ -179,16 +168,19 @@ public class MovementInputSystem : MonoBehaviour
                 TParamLoop();
             }
         }
-
+        
         if (vSpeed > -5)
         {
+            if (vSpeed > 0) isFalling = false;
+            else isFalling = true;
+
             if (!controller.isGrounded)
             {
                 vSpeed -= gravity * Time.deltaTime;
             }
         }
         
-        Debug.Log("vSpeed è: " + vSpeed);
+        //Debug.Log("vSpeed è: " + vSpeed);
 
         MoveToPoint(objectPosition, vSpeed);
     }
@@ -220,7 +212,7 @@ public class MovementInputSystem : MonoBehaviour
 
             routeToGo += 1;
 
-            if (routeToGo > routes.Length - 1)
+            if (routeToGo > routesTransform.Length - 1)
             {
                 //vediamo che fare quando arriva alla fine
                 Debug.Log("Sei alla fine della route");
@@ -234,7 +226,7 @@ public class MovementInputSystem : MonoBehaviour
 
             routeToGo -= 1;
 
-            if (routeToGo > routes.Length - routes.Length)
+            if (routeToGo > routesTransform.Length - routesTransform.Length)
             {
                 //vediamo che fare quando arriva all'inizio
                 Debug.Log("Sei all'inizio della route");

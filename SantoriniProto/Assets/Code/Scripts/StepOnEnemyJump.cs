@@ -17,15 +17,10 @@ public class StepOnEnemyJump : MonoBehaviour
 
     private void Update()
     {
-        Vector3 down = transform.TransformDirection(Vector3.down);
-<<<<<<< Updated upstream
-
-
-=======
+        Vector3 down = transform.TransformDirection(-transform.up);
         RaycastHit enemyHit;
         EnemyStatus enemyStatus;
->>>>>>> Stashed changes
-        if (Physics.Raycast(transform.position, down, out enemyHit, .3f, enemyMask))
+        if (Physics.BoxCast(transform.position, Vector3.one* .5f, down, out enemyHit, Quaternion.identity, .2f, enemyMask))
         {
             mis.vSpeed = stepOnJumpForce;
             enemyStatus = enemyHit.collider.gameObject.GetComponent<EnemyStatus>();
