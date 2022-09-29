@@ -62,6 +62,33 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": ""Hold(duration=0.11)"",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Punch"",
+                    ""type"": ""Button"",
+                    ""id"": ""dfdba6d3-8a36-420c-8971-97cc4ef96464"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Kick"",
+                    ""type"": ""Button"",
+                    ""id"": ""f91e8051-4d69-472e-8e79-9a2a675e9b3c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Use powerup"",
+                    ""type"": ""Button"",
+                    ""id"": ""301fb81c-19e3-43ef-818f-80ef50def1ff"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -152,6 +179,39 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""action"": ""HighJump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a0fad01b-0c57-468a-9d14-b30dc5527982"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Punch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e14d6b27-3fe6-4cb4-b720-093f1a4645fa"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Kick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""999c2ae2-04f5-40b5-bf71-046a4bdfd692"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Use powerup"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -164,6 +224,9 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         m_Gameplay_CamMove = m_Gameplay.FindAction("Cam Move", throwIfNotFound: true);
         m_Gameplay_Jump = m_Gameplay.FindAction("Jump", throwIfNotFound: true);
         m_Gameplay_HighJump = m_Gameplay.FindAction("HighJump", throwIfNotFound: true);
+        m_Gameplay_Punch = m_Gameplay.FindAction("Punch", throwIfNotFound: true);
+        m_Gameplay_Kick = m_Gameplay.FindAction("Kick", throwIfNotFound: true);
+        m_Gameplay_Usepowerup = m_Gameplay.FindAction("Use powerup", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -227,6 +290,9 @@ public partial class @Controls : IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_CamMove;
     private readonly InputAction m_Gameplay_Jump;
     private readonly InputAction m_Gameplay_HighJump;
+    private readonly InputAction m_Gameplay_Punch;
+    private readonly InputAction m_Gameplay_Kick;
+    private readonly InputAction m_Gameplay_Usepowerup;
     public struct GameplayActions
     {
         private @Controls m_Wrapper;
@@ -235,6 +301,9 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         public InputAction @CamMove => m_Wrapper.m_Gameplay_CamMove;
         public InputAction @Jump => m_Wrapper.m_Gameplay_Jump;
         public InputAction @HighJump => m_Wrapper.m_Gameplay_HighJump;
+        public InputAction @Punch => m_Wrapper.m_Gameplay_Punch;
+        public InputAction @Kick => m_Wrapper.m_Gameplay_Kick;
+        public InputAction @Usepowerup => m_Wrapper.m_Gameplay_Usepowerup;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -256,6 +325,15 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @HighJump.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnHighJump;
                 @HighJump.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnHighJump;
                 @HighJump.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnHighJump;
+                @Punch.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPunch;
+                @Punch.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPunch;
+                @Punch.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPunch;
+                @Kick.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnKick;
+                @Kick.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnKick;
+                @Kick.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnKick;
+                @Usepowerup.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnUsepowerup;
+                @Usepowerup.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnUsepowerup;
+                @Usepowerup.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnUsepowerup;
             }
             m_Wrapper.m_GameplayActionsCallbackInterface = instance;
             if (instance != null)
@@ -272,6 +350,15 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @HighJump.started += instance.OnHighJump;
                 @HighJump.performed += instance.OnHighJump;
                 @HighJump.canceled += instance.OnHighJump;
+                @Punch.started += instance.OnPunch;
+                @Punch.performed += instance.OnPunch;
+                @Punch.canceled += instance.OnPunch;
+                @Kick.started += instance.OnKick;
+                @Kick.performed += instance.OnKick;
+                @Kick.canceled += instance.OnKick;
+                @Usepowerup.started += instance.OnUsepowerup;
+                @Usepowerup.performed += instance.OnUsepowerup;
+                @Usepowerup.canceled += instance.OnUsepowerup;
             }
         }
     }
@@ -282,5 +369,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         void OnCamMove(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnHighJump(InputAction.CallbackContext context);
+        void OnPunch(InputAction.CallbackContext context);
+        void OnKick(InputAction.CallbackContext context);
+        void OnUsepowerup(InputAction.CallbackContext context);
     }
 }

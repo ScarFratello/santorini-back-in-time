@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Events;
+using Unity.VisualScripting;
 
 public class MovementInputSystem : MonoBehaviour
 {
@@ -18,7 +20,8 @@ public class MovementInputSystem : MonoBehaviour
     Vector2 direction;
     //public float speedAnim = 0f;
     [Header("FollowPath")]
-    [SerializeField] private Transform[] routes;
+    [SerializeField] private GameObject routes;
+    private Transform[] routesTransform;
     private int routeToGo;
     private float tParam;
     private Vector3 objectPosition;
@@ -28,12 +31,13 @@ public class MovementInputSystem : MonoBehaviour
     private Vector2 lastDir;
 
     [Header("Rotation")]
-    [SerializeField] [Range(0, 1f)] private float turnSmoothTime = .1f;
+    [SerializeField][Range(0, 1f)] private float turnSmoothTime = .1f;
     private bool canRotate = true;
 
     [Header("Jump")]
     [SerializeField] private float jumpForce = 3f, highJumpForce = 1f;
     private float gravity = 3f;
+    private bool isFalling;
     public float vSpeed = 0f; // current vertical velocity
     [SerializeField]
     private int howManyJump = 2;
@@ -42,6 +46,12 @@ public class MovementInputSystem : MonoBehaviour
     private bool isHittedEnemy;
     [SerializeField]
     private float enemyPushForce = .3f;
+    [Header("Animation Events")]
+    public UnityEvent<float> OnUpdateSpeed;
+    public UnityEvent<bool> OnIsGrounded;
+    public UnityEvent<bool> OnIsFalling;
+    public UnityEvent OnJump;
+    public UnityEvent OnDoubleJump;
     #endregion
 
     private void Awake()
@@ -49,20 +59,30 @@ public class MovementInputSystem : MonoBehaviour
         routeToGo = 2;
         //il player comincia a muoversi dal secondo Control Point
         tParam = 0f;
-
+        routesTransform = new Transform[routes.transform.childCount];
+        for (int i = 0; i < routes.transform.childCount; i++)
+        {
+            routesTransform[i] = routes.transform.GetChild(i).transform;
+        }
         controls = new Controls();
         controls.Gameplay.Enable();
         controls.Gameplay.Jump.performed += Jump;
         controls.Gameplay.HighJump.performed += HighJump;
     }
-
+    private IEnumerator JumpWaitCoroutine(float highJumpForce)
+    {
+        yield return new WaitForSeconds(10f / 30f);
+        vSpeed = jumpForce + highJumpForce;
+    }
     public void Jump(InputAction.CallbackContext context)
     {
         //context.performed è quando premiamo il tasto
         if (context.performed && jumpCounter < howManyJump)
         {
-            vSpeed = jumpForce;
+            StartCoroutine(JumpWaitCoroutine(0f));
+            Debug.Log("Salto");
             jumpCounter++;
+            OnJump.Invoke();
         }
     }
 
@@ -71,8 +91,10 @@ public class MovementInputSystem : MonoBehaviour
         //context.performed è quando premiamo il tasto
         if (context.performed && jumpCounter < howManyJump)
         {
-            vSpeed = jumpForce + highJumpForce;
+            StartCoroutine(JumpWaitCoroutine(highJumpForce));
+            Debug.Log("Salto alto");
             jumpCounter++;
+            OnJump.Invoke();
         }
     }
 
@@ -83,13 +105,17 @@ public class MovementInputSystem : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Vector3 p0 = routes[routeToGo].GetChild(0).position;
-        Vector3 p1 = routes[routeToGo].GetChild(1).position;
-        Vector3 p2 = routes[routeToGo].GetChild(2).position;
-        Vector3 p3 = routes[routeToGo].GetChild(3).position;
+
+        Vector3 p0 = routesTransform[routeToGo].GetChild(0).position;
+        Vector3 p1 = routesTransform[routeToGo].GetChild(1).position;
+        Vector3 p2 = routesTransform[routeToGo].GetChild(2).position;
+        Vector3 p3 = routesTransform[routeToGo].GetChild(3).position;
 
         #region -SetAnimation-
-        
+        OnIsGrounded.Invoke(controller.isGrounded);
+        OnIsFalling.Invoke(isFalling);
+        OnUpdateSpeed.Invoke(Mathf.Abs(controls.Gameplay.Move.ReadValue<Vector2>().x));
+
         #endregion
 
         if (direction.magnitude > .15f)
@@ -140,7 +166,7 @@ public class MovementInputSystem : MonoBehaviour
                             }
                             TParamLoop();
                         }
-                        else if(lastDir.x != moveDir.x)
+                        else if (lastDir.x != moveDir.x)
                         {
                             canRotate = false;
                             tParam += -lastDir.x * speedModifier;
@@ -161,6 +187,9 @@ public class MovementInputSystem : MonoBehaviour
 
         if (vSpeed > -5)
         {
+            if (vSpeed > 0) isFalling = false;
+            else isFalling = true;
+
             if (!controller.isGrounded)
             {
                 vSpeed -= gravity * Time.deltaTime;
@@ -184,7 +213,7 @@ public class MovementInputSystem : MonoBehaviour
         {
             transform.rotation = Quaternion.LookRotation(movRot);
         }
-        
+
         controller.Move(movDiff * speed * Time.deltaTime);
     }
 
@@ -197,7 +226,7 @@ public class MovementInputSystem : MonoBehaviour
 
             routeToGo += 1;
 
-            if (routeToGo > routes.Length - 1)
+            if (routeToGo > routesTransform.Length - 1)
             {
                 //vediamo che fare quando arriva alla fine
                 Debug.Log("Sei alla fine della route");
@@ -211,14 +240,13 @@ public class MovementInputSystem : MonoBehaviour
 
             routeToGo -= 1;
 
-            if (routeToGo > routes.Length - routes.Length)
+            if (routeToGo > routesTransform.Length - routesTransform.Length)
             {
                 //vediamo che fare quando arriva all'inizio
                 Debug.Log("Sei all'inizio della route");
             }
         }
     }
-
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
         if ((controller.collisionFlags & CollisionFlags.Sides) != 0 && canCheckNormal)
@@ -229,11 +257,12 @@ public class MovementInputSystem : MonoBehaviour
             {
                 isHittedEnemy = true;
                 StartCoroutine(CanRotate());
+                EnemyStatus enemy = hit.gameObject.GetComponent<EnemyStatus>();
+                enemy.DoDamage(gameObject.GetComponent<PlayerStatus>());
             }
-            canCheckNormal = false;
-            Debug.Log("forward " + transform.forward
-                + "normal " + hit.normal + "normal hit" + normalHit);
         }
+            canCheckNormal = false;
+            //Debug.Log("forward " + transform.forward + "normal " + hit.normal + "normal hit" + normalHit);
 
         if (controller.isGrounded)
         {

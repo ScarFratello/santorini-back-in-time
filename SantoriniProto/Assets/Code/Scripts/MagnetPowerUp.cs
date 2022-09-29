@@ -17,12 +17,12 @@ public class MagnetPowerUp : PowerUp
     {
         LifeTime = 10f;
     }
-    override public byte Attack(EnemyStatus enemy)
+    override public sbyte Attack(EntityStatus enemy)
     {
         throw new NotSupportedException("This powerup has no defensive effect");
     }
 
-    override public byte Defend()
+    override public sbyte Defend()
     {
         throw new NotSupportedException("This powerup has no defensive effect");
     }

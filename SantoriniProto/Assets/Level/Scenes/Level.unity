@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 1709690535}
-  m_IndirectSpecularColor: {r: 0.18154615, g: 0.22718664, b: 0.3074041, a: 1}
+  m_IndirectSpecularColor: {r: 0.1815468, g: 0.22718757, b: 0.30740595, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -11450,6 +11450,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ground
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a78bb2defff2c497b9f6c4bab2195b7e,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a78bb2defff2c497b9f6c4bab2195b7e, type: 3}
 --- !u!1001 &539675709
@@ -15596,7 +15601,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &760485937
 Transform:
   m_ObjectHideFlags: 0
@@ -15647,27 +15652,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 760485938}
   speed: 8
-  routes:
-  - {fileID: 1262003798}
-  - {fileID: 1975440621}
-  - {fileID: 1380779828}
-  - {fileID: 1373855689}
-  - {fileID: 2104697109}
-  - {fileID: 1383128835}
-  - {fileID: 359795795}
-  - {fileID: 1919453232}
-  - {fileID: 1578149893}
-  - {fileID: 1722137657}
-  - {fileID: 1614997294}
-  - {fileID: 359260840}
-  - {fileID: 1474031865}
-  - {fileID: 753129102}
-  - {fileID: 1571212531}
-  - {fileID: 125554427}
-  - {fileID: 1722264695}
-  - {fileID: 892593170}
-  - {fileID: 1176241377}
-  - {fileID: 1389285843}
+  routes: {fileID: 492725939}
   speedModifier: 0.005
   turnSmoothTime: 0.1
   jumpForce: 1
@@ -15675,6 +15660,57 @@ MonoBehaviour:
   vSpeed: 0
   howManyJump: 2
   enemyPushForce: 0.1
+  OnUpdateSpeed:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 11500000, guid: c0962c8b070e05e43ab19844ec460363, type: 3}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnIsGrounded:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 11500000, guid: c0962c8b070e05e43ab19844ec460363, type: 3}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnIsFalling:
+    m_PersistentCalls:
+      m_Calls: []
+  OnJump:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 11500000, guid: c0962c8b070e05e43ab19844ec460363, type: 3}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnDoubleJump:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!23 &760485940
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -19432,8 +19468,8 @@ MonoBehaviour:
   m_StreamingVersion: 20170927
   m_Priority: 10
   m_StandbyUpdate: 2
-  m_LookAt: {fileID: 760485937}
-  m_Follow: {fileID: 760485937}
+  m_LookAt: {fileID: 1591619182710879530}
+  m_Follow: {fileID: 1591619182710879530}
   m_Lens:
     FieldOfView: 40
     OrthographicSize: 10

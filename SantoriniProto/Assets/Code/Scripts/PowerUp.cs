@@ -9,9 +9,9 @@ public abstract class PowerUp : MonoBehaviour, IPowerUp
     public Coroutine Destroyer;
     public GameObject PowerupObject;
 
-    public abstract byte Attack(EnemyStatus enemy);
+    public abstract sbyte Attack(EntityStatus enemy);
 
-    public abstract byte Defend();
+    public abstract sbyte Defend();
 
     public IEnumerator DestroyPowerupCoroutine(float time)
     {

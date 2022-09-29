@@ -40,6 +40,33 @@
                     "processors": "",
                     "interactions": "Hold(duration=0.11)",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Punch",
+                    "type": "Button",
+                    "id": "dfdba6d3-8a36-420c-8971-97cc4ef96464",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Kick",
+                    "type": "Button",
+                    "id": "f91e8051-4d69-472e-8e79-9a2a675e9b3c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Use powerup",
+                    "type": "Button",
+                    "id": "301fb81c-19e3-43ef-818f-80ef50def1ff",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -128,6 +155,39 @@
                     "processors": "",
                     "groups": "",
                     "action": "HighJump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a0fad01b-0c57-468a-9d14-b30dc5527982",
+                    "path": "<Keyboard>/leftCtrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Punch",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e14d6b27-3fe6-4cb4-b720-093f1a4645fa",
+                    "path": "<Keyboard>/leftShift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Kick",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "999c2ae2-04f5-40b5-bf71-046a4bdfd692",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Use powerup",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
